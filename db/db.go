@@ -11,7 +11,7 @@ var Client *ent.Client
 
 func init() {
 	var err error
-	Client, err = ent.Open("mysql", "root:123456@tcp(localhost:3306)/web?parseTime=True")
+	Client, err = ent.Open("mysql", "root:root@tcp(localhost:3306)/adopt?parseTime=True")
 
 	if err != nil {
 		log.Fatalf("failed opening connection to mysql: %v", err)
