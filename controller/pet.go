@@ -2,7 +2,9 @@ package controller
 
 import (
 	"context"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"math/rand"
 	"strconv"
 	"webapp/ent"
 	"webapp/pkg/resp"
@@ -14,22 +16,33 @@ func ListPets(c *gin.Context) {
 	resp.CommonResp(c, service.ListPet(context.Background()))
 }
 
-type CreatePetReq struct {
-	AnimalBreed  string `json:"animal_breed,omitempty" binding:"required"`
-	Introduction string `json:"introduction,omitempty" binding:"required"`
-	Picture      string `json:"picture,omitempty" binding:"required"`
-	Name         string `json:"name,omitempty" binding:"required"`
-}
-
 func CreatePet(c *gin.Context) {
-	var req CreatePetReq
-	err := c.ShouldBind(&req)
+	AnimalBreed := c.PostForm("animal_breed")
+	Introduction := c.PostForm("introduction")
+	Name := c.PostForm("name")
+	if Name == "" || Introduction == "" || AnimalBreed == "" {
+		c.Error(errors.New("参数不全"))
+		return
+	}
+	//上传
+	file, err := c.FormFile("picture")
+	if err != nil {
+		c.Error(err)
+		return
+	}
+	open, err := file.Open()
+	if err != nil {
+		c.Error(err)
+		return
+	}
+	addr, err := service.UploadFile(strconv.Itoa(rand.Int()), file.Filename, open)
 	if err != nil {
 		c.Error(err)
 		return
 	}
 	u := c.MustGet("user").(*ent.User)
-	err = service.CreatePet(context.Background(), req.AnimalBreed, req.Introduction, req.Picture, req.Name, u)
+
+	err = service.CreatePet(context.Background(), AnimalBreed, Introduction, addr, Name, u)
 	if err != nil {
 		c.Error(err)
 		return
