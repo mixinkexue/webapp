@@ -12,12 +12,13 @@ func main() {
 	r := gin.Default()
 	r.Static("/static", "font")
 	store := cookie.NewStore([]byte("store"))
-	r.Use(middleware.Cors())
-	r.Use(middleware.HandleError)
-	r.Use(sessions.Sessions("token", store))
+	webapp := r.Group("webapp")
+	webapp.Use(middleware.Cors())
+	webapp.Use(middleware.HandleError)
+	webapp.Use(sessions.Sessions("token", store))
 
 	{
-		user := r.Group("user")
+		user := webapp.Group("user")
 		user.POST("register", controller.Register)
 		user.POST("login", controller.Login)
 		user.Use(middleware.Auth)
@@ -27,7 +28,7 @@ func main() {
 		user.POST("updateHead", controller.UpdateHead)
 	}
 	{
-		pet := r.Group("pet")
+		pet := webapp.Group("pet")
 		pet.GET("list", controller.ListPets)
 		pet.Use(middleware.Auth)
 		pet.POST("create", controller.CreatePet)
