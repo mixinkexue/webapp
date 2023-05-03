@@ -1,0 +1,45 @@
+/* 按钮样式 */
+#open-form-btn {
+    padding: 10px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* 表单样式 */
+#form-container {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+#form-container h2 {
+    margin-top: 0;
+}
+
+#form-container label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#form-container input[type="file"] {
+    display: block;
+    margin-bottom: 10px;
+}
+
+#form-container button[type="submit"] {
+    padding: 10px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}

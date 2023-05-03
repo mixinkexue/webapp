@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <link rel="stylesheet" href="mine.css">
+</head>
+<body>
+<button id="open-form-btn">打开表单</button>
+
+<!-- 表单 -->
+<div id="form-container">
+  <h2>上传图片和名称</h2>
+  <form id="upload-form">
+    <label for="image-input">图片：</label>
+    <input type="file" id="image-input" accept="image/*">
+    <br>
+    <label for="name-input">名称：</label>
+    <input type="text" id="name-input">
+    <br>
+    <button type="submit">提交</button>
+  </form>
+</div>
+<script>
+  // 获取页面元素
+  const openFormBtn = document.getElementById('open-form-btn');
+  const formContainer = document.getElementById('form-container');
+  const uploadForm = document.getElementById('upload-form');
+  const imageInput = document.getElementById('image-input');
+  const nameInput = document.getElementById('name-input');
+
+  // 点击按钮打开表单
+  openFormBtn.addEventListener('click', () => {
+    formContainer.style.display = 'block';
+  });
+
+  // 提交表单时上传图片和名称
+  uploadForm.addEventListener('submit', (event) => {
+    event.preventDefault(); // 阻止默认提交行为
+
+    // 构建 FormData 对象并上传数据
+    const formData = new FormData();
+    formData.append('image', imageInput.files[0]);
+    formData.append('name', nameInput.value);
+
+    // TODO：发送 AJAX 请求上传数据
+
+    // 清空表单
+    uploadForm.reset();
+    formContainer.style.display = 'none';
+  });
+
+</script>
+</body>
+</html>

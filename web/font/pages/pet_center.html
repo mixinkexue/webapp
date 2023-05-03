@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="pet_center.css"/>
+  <meta name="referrer" content="no-referrer">
+  <title>领养中心</title>
+  <link rel="import" href="navigation.html" id="navigation"/>
+  <script src="../js/user.js"></script>
+  <script src="../js/pet.js"></script>
+</head>
+<body>
+<iframe src="navigation.html" width="100%" height="90px" scrolling="no" frameborder=0
+        style="vertical-align: bottom"></iframe>
+<div id="pet-container" class="pet-grid" >
+  <!-- 宠物展示卡片 -->
+  <!--<div class="pet-card">
+    <img src="http://cdn.redrock.team/web_app_test.jpg" alt="Pet Image" class="pet-image">
+    <div class="pet-name">Pet 1</div>
+    <div class="pet-desc">This is a pet.</div>
+    <button class="pet-button" onclick="alert('You clicked Pet 1')">Click Me!</button>
+  </div>-->
+
+</div>
+<script>
+  const petGrid = document.querySelector('#pet-container');
+
+  // 使用fetch函数获取数据
+  fetch('/webapp/pet/list')
+          .then(response => response.json())
+          .then(data => {
+            data=data.data
+            // 遍历宠物列表，并将每个宠物渲染成一个卡片
+            data.forEach(pet => {
+              const petCard = document.createElement('div');
+              petCard.classList.add('pet-card');
+
+              const petImage = document.createElement('img');
+              petImage.src = pet.picture;
+              petImage.alt = pet.name;
+              petCard.appendChild(petImage);
+
+              const petName = document.createElement('h2');
+              petName.textContent = pet.name;
+              petCard.appendChild(petName);
+
+              const petDescription = document.createElement('p');
+              petDescription.textContent = pet.introduction;
+              petCard.appendChild(petDescription);
+
+              const petButton = document.createElement('button');
+              petButton.classList.add('pet-button')
+              petButton.textContent = 'Adopt';
+              petButton.addEventListener("click", function() {
+                  adoptAPet(pet.id)
+              });
+
+              petCard.appendChild(petButton);
+              petGrid.appendChild(petCard);
+            });
+          })
+          .catch(error => {
+            console.error('Error fetching pet data:', error);
+          });
+</script>
+</body>
+</html>

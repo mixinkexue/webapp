@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="referrer" content="no-referrer">
+    <link rel="stylesheet" href="home.css"/>
+    <link rel="import" href="navigation.html" id="navigation"/>
+
+</head>
+<body>
+<iframe src="navigation.html" width="100%" height="90px" scrolling="no" frameborder=0
+        style="vertical-align: bottom"></iframe>
+<div class="centered">
+    <p>获取更多关于可爱动物的信息，请访问下面的的网站</p>
+</div>
+<div id="slideshow">
+    <a href="https://www.lovepet.cn/"><img src="../img/love_pet.jpg" alt="lovepet.cn"></a>
+    <a href="https://www.ciwf.cn/"><img src="../img/2.2.png" alt="ciwf.cn"></a>
+    <a href="https://capn-online.info"><img src="../img/capn.jpg" alt="capn-online.info"></a>
+</div>
+
+<div id="slideshow-nav"></div>
+<script>
+
+    const slideshow = document.getElementById('slideshow');
+    const links = slideshow.getElementsByTagName('a');
+    //当前位置
+    var current = 0;
+    var timer;
+
+    function startSlideshow() {
+        timer = setInterval(function () {
+            links[current].style.zIndex = -1;
+            current = (current + 1) % links.length;
+            links[current].style.zIndex = 1;
+            current = (current + 1) % links.length;
+            links[current].style.zIndex = -1;
+            current = (current + 1) % links.length;
+            current = (current + 1) % links.length;
+            updateNav();
+        }, 5000);
+    }
+
+
+    function goToSlide(index) {
+        links[index].style.zIndex = 1;
+        current=index
+        index = (index + 1) % links.length;
+        links[index].style.zIndex = -1;
+        index = (index + 1) % links.length;
+        links[index].style.zIndex = -1;
+        updateNav();
+    }
+
+    function createNav() {
+        var nav = document.getElementById("slideshow-nav");
+        nav.classList.add("nav");
+
+        for (var i = 0; i < links.length; i++) {
+            var button = document.createElement("a");
+            button.textContent = i + 1;
+            button.dataset.index = i;
+            button.addEventListener("click", function () {
+                const index = parseInt(this.dataset.index);
+                goToSlide(index);
+                clearInterval(timer);
+                startSlideshow();
+            });
+            nav.appendChild(button);
+        }
+
+        // 修改数字导航条按钮的样式
+        var buttons = nav.querySelectorAll("a");
+        buttons.forEach(function (button) {
+            button.style.width = "30px";
+            button.style.height = "30px";
+            button.style.margin = "10px 10px";
+            button.style.borderRadius = "50%";
+            button.style.backgroundColor = "#ccc";
+            button.style.textAlign = "center";
+            button.style.lineHeight = "30px";
+            button.style.fontSize = "16px";
+            button.style.fontWeight = "bold";
+            button.style.color = "#fff";
+            button.style.textDecoration = "none";
+            button.addEventListener('mouseover', function () {
+                button.style.backgroundColor = 'lightblue';
+                button.style.cursor = 'pointer';
+            });
+
+            button.addEventListener('mouseout', function () {
+                button.style.backgroundColor = '#ccc';
+            });
+        });
+    }
+
+    function updateNav() {
+        var buttons = document.getElementById('slideshow-nav').getElementsByTagName('button');
+        for (var i = 0; i < buttons.length; i++) {
+            if (i === current) {
+                buttons[i].classList.add('active');
+            } else {
+                buttons[i].classList.remove('active');
+            }
+        }
+    }
+
+    createNav()
+    startSlideshow();
+</script>
+</body>
+</html>

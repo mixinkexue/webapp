@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="user.css"/>
+    <meta name="referrer" content="no-referrer">
+    <title>个人中心</title>
+    <link rel="import" href="navigation.html"/>
+    <script src="../js/user.js"></script>
+</head>
+<body>
+<iframe src="navigation.html" width="100%" height="90px" scrolling="no" frameborder=0
+        style="vertical-align: bottom"></iframe>
+<div class="profile-container">
+    <img id="avatar" src="" alt="avatar">
+    <h2 id="username">John Doe</h2>
+    <p id="career">Web Developer</p>
+    <ul>
+        <li id="email"></li>
+        <li id="phone"></li>
+        <li id="address"></li>
+        <li id="age"></li>
+    </ul>
+</div>
+<!--修改头像部分的对话框-->
+<div id="dialog" class="dialog">
+    <div class="dialog-content">
+        <span class="close">&times;</span>
+        <h2>选择你的新头像</h2>
+        <form action="#" enctype="multipart/form-data">
+            <input type="file" name="image" accept="image/*">
+            <button type="submit">确认</button>
+        </form>
+    </div>
+</div>
+<!-- 弹出修改个人信息的按钮 -->
+<button id="edit-btn" class="bth">编辑个人信息</button>
+<button id="logout-bth" class="bth">退出登陆</button>
+
+<!-- 修改个人信息的弹出框 -->
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>修改个人信息</h2>
+        <form>
+            <div class="form-group">
+                <label for="in_career">career</label>
+                <input type="text" id="in_career" name="career" required>
+            </div>
+            <div class="form-group">
+                <label for="in_email">email</label>
+                <input type="email" id="in_email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="in_phone">phone</label>
+                <input type="text" id="in_phone" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="in_addr">addr</label>
+                <input type="text" id="in_addr" name="addr" required>
+            </div>
+            <div class="form-group">
+                <label for="in_age">age</label>
+                <input type="number" id="in_age" name="age" required>
+            </div>
+            <div style="display: flex;justify-content: center;align-items: center;">
+                <button type="button" id="submit-btn">保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- 初始化个人信息-->
+<script>
+    setUser()
+    if (!has_login) {
+        window.location.href = 'login.html';
+    }
+    const img = document.getElementById("avatar");
+    img.src = image
+    const username1 = document.getElementById("username")
+    username1.textContent = username
+    const career1 = document.getElementById("career")
+    career1.textContent = career
+    const email1 = document.getElementById("email")
+    if (email===undefined){
+        email="未设置"
+    }
+    email1.innerHTML = '<strong>Email:</strong> ' + email
+    if (phone===undefined){
+        phone="未设置"
+    }
+    const phone1 = document.getElementById("phone")
+    phone1.innerHTML = '<strong>Phone:</strong> ' + phone
+    const address1 = document.getElementById("address")
+    if (address===undefined){
+        address="未设置"
+    }
+    address1.innerHTML = '<strong>Address:</strong> ' + address
+    const age1 = document.getElementById("age")
+    if (age===undefined){
+        age=0
+    }
+    age1.innerHTML = '<strong>Age:</strong> ' + age
+</script>
+<script>
+    //获取修改框，按钮等等
+    const modal = document.getElementById("edit-modal");
+    const editBtn = document.getElementById("edit-btn");
+    //对应个人修改框close
+    const closeBtn = document.getElementsByClassName("close")[1];
+
+    // 当用户单击打开按钮时，弹出修改个人信息界面
+    editBtn.onclick = function () {
+        modal.style.display = "block";
+    }
+
+    // 当用户单击关闭按钮或在窗口外单击时，关闭弹出框
+    closeBtn.onclick = function () {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function (event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // 原来的值
+    document.getElementById("in_addr").value = address;
+    document.getElementById("in_email").value = email;
+    document.getElementById("in_phone").value = phone;
+    document.getElementById("in_career").value = career;
+    document.getElementById("in_age").value = age;
+    // 获取提交按钮元素
+    let submitBtn = document.getElementById("submit-btn");
+
+    // 当用户单击提交按钮时，发送修改请求
+    submitBtn.onclick = function () {
+        // 获取用户名、电子邮件和头像信息
+        const addr = document.getElementById("in_addr").value;
+        const email = document.getElementById("in_email").value;
+        const phone = document.getElementById("in_phone").value;
+        const career = document.getElementById("in_career").value;
+        const age = document.getElementById("in_age").value;
+        // 构造 FormData 对象，将表单数据和文件对象添加到其中
+        const formData = new FormData();
+        formData.append("addr", addr);
+        formData.append("email", email);
+        formData.append("phone", phone);
+        formData.append("career", career);
+        formData.append("age", age);
+        const data = {
+            addr: document.getElementById("in_addr").value,
+            email: document.getElementById("in_email").value,
+            phone: document.getElementById("in_phone").value,
+            career: document.getElementById("in_career").value,
+            age: document.getElementById("in_age").value,
+        }
+        // 发送 POST 请求，将 FormData 对象作为数据发送到服务器
+        fetch("/webapp/user/update", {
+            method: "POST",
+            body: JSON.stringify(data),
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('后台服务故障');
+                }
+            })
+            .then(data => {
+                    if (data.code === 200) {
+                        // 修改成功,刷新页面
+                        location.reload();
+                    } else {
+                        alert(data.data)
+                    }
+                }
+            )
+            .catch(error => {
+                alert(error);
+            });
+    }
+    let logoutBtn = document.getElementById("logout-bth");
+    logoutBtn.onclick = function () {
+        logout()
+        window.location.href = 'home.html';
+    }
+</script>
+<!--头像的修改框-->
+<script>
+    // 获取对话框和关闭按钮
+    const dialog = document.getElementById("dialog");
+    const closeBtn0 = document.getElementsByClassName("close")[0];
+
+    // 添加点击事件监听器
+    document.getElementById("avatar").addEventListener("click", function () {
+        // 显示对话框
+        dialog.style.display = "block";
+    });
+
+    // 添加关闭按钮的点击事件监听器
+    closeBtn0.addEventListener("click", function () {
+        // 隐藏对话框
+        dialog.style.display = "none";
+    });
+
+    dialog.querySelector("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const fileInput = this.querySelector("input[type='file']");
+        // 创建 FormData 对象
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+        fetch('/webapp/user/updateHead', {
+            method: "POST",
+            body: formData,
+            credentials: 'include'
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json()
+                } else {
+                    throw new Error('后台服务故障');
+                }
+            })
+            .then(data => {
+                    if (data.code === 200) {
+                        // 修改成功，关闭弹出框并刷新页面
+                        alert("修改头像成功");
+                        location.reload();
+                    } else {
+                        alert(data.data)
+                    }
+                }
+            )
+            .catch(error => {
+                alert(error);
+            });
+    });
+</script>
+</body>
+</html>
