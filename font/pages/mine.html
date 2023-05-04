@@ -1,55 +1,105 @@
 <!DOCTYPE html>
+<!--suppress ALL -->
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-  <link rel="stylesheet" href="mine.css">
+    <title>上传宠物</title>
+    <link rel="stylesheet" href="mine.css">
 </head>
-<body>
-<button id="open-form-btn">打开表单</button>
 
+<body>
+<iframe src="navigation.html" width="100%" height="90px" scrolling="no" frameborder=0
+        style="vertical-align: bottom"></iframe>
 <!-- 表单 -->
 <div id="form-container">
-  <h2>上传图片和名称</h2>
-  <form id="upload-form">
-    <label for="image-input">图片：</label>
-    <input type="file" id="image-input" accept="image/*">
-    <br>
-    <label for="name-input">名称：</label>
-    <input type="text" id="name-input">
-    <br>
-    <button type="submit">提交</button>
-  </form>
+    <h2>上传宠物</h2>
+    <form id="upload-form">
+        <label for="image-input">Picture</label>
+        <input type="file" id="picture" accept="image/*">
+        <br>
+        <label for="name-input">Name</label>
+        <input type="text" id="name" placeholder="5个字符以内">
+        <br>
+        <label for="name-input">种类</label>
+        <input type="text" id="animal_breed" placeholder="5个字符以内">
+        <br>
+        <label for="name-input">介绍</label>
+        <input type="text" id="introduction" placeholder="15个字符以内">
+        <br>
+        <button type="submit" id="submit-btn">提交</button>
+    </form>
 </div>
 <script>
-  // 获取页面元素
-  const openFormBtn = document.getElementById('open-form-btn');
-  const formContainer = document.getElementById('form-container');
-  const uploadForm = document.getElementById('upload-form');
-  const imageInput = document.getElementById('image-input');
-  const nameInput = document.getElementById('name-input');
 
-  // 点击按钮打开表单
-  openFormBtn.addEventListener('click', () => {
-    formContainer.style.display = 'block';
-  });
+    // 获取页面元素
+    const picture = document.getElementById('picture');
+    const name = document.getElementById('name');
+    const submitBtn = document.getElementById("submit-btn");
+    const animal_breed = document.getElementById("animal_breed");
+    const introduction = document.getElementById("introduction");
 
-  // 提交表单时上传图片和名称
-  uploadForm.addEventListener('submit', (event) => {
-    event.preventDefault(); // 阻止默认提交行为
+    submitBtn.addEventListener("click", function (event) {
+        event.preventDefault(); // 阻止默认提交行为
 
-    // 构建 FormData 对象并上传数据
-    const formData = new FormData();
-    formData.append('image', imageInput.files[0]);
-    formData.append('name', nameInput.value);
+        // 转换图片
+        const fileReader = new FileReader();
+        fileReader.onload = function (e) {
+            const img = new Image();
+            img.onload = function () {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 183;
+                canvas.height = 122;
+                ctx.drawImage(img, 0, 0, 183, 122);
+                const dataUrl = canvas.toDataURL('image/png');
+                const file = dataURLtoFile(dataUrl, 'picture.png');
 
-    // TODO：发送 AJAX 请求上传数据
+                // 获取表单数据
+                const formData = new FormData();
+                formData.append('picture', file);
+                formData.append('name', name.value);
+                formData.append('animal_breed', animal_breed.value);
+                formData.append('introduction', introduction.value);
 
-    // 清空表单
-    uploadForm.reset();
-    formContainer.style.display = 'none';
-  });
+                // 创建 XMLHttpRequest 对象
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "/webapp/pet/create");
+                xhr.send(formData);
+
+                // 监听 XMLHttpRequest 的状态变化
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            alert("表单提交成功");
+                            window.location.href = 'my_pet.html';
+                        } else {
+                            alert("表单提交失败");
+                        }
+                    }
+                }
+            }
+            //放在底部是为了更快的加载其他代码
+            img.src = e.target.result;
+        };
+        //放在底部是为了更快的加载其他代码
+        fileReader.readAsDataURL(picture.files[0]);
+    });
+
+    function dataURLtoFile(dataurl, filename) {
+        const arr = dataurl.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new File([u8arr], filename, {type: mime});
+    }
+
 
 </script>
 </body>
+
 </html>

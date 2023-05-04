@@ -33,3 +33,51 @@
 .centered p{
     text-align: center;
 }
+
+.container {
+    display: flex;
+    background-color: #1d1b1b;
+    justify-content: center;
+}
+
+.box_size {
+    display: flex;
+    width: 970px;
+}
+
+/* 宽度 */
+.introduction_pet, .pet, .connection {
+    width: 33.33333333%;
+}
+
+/* 设置标题的大小和颜色 */
+h3 {
+    font-size: 27px;
+    color: #eee;
+}
+
+
+.row1 .row2 {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.img {
+    float: left;
+    width: 26.33%;
+    padding: 5px;
+}
+p {
+    color: #eee;
+    margin: 0;
+    font-family: 'Raleway', sans-serif;
+    letter-spacing: 1px;
+    font-size: 15px;
+    color: #999;
+    line-height: 1.9em;
+}
+
+
+.introduction_pet, .pet {
+    margin-right: 20px;
+}
