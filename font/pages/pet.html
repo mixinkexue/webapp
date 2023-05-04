@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="pet.css"/>
+    <meta name="referrer" content="no-referrer">
+    <title>我的宠物</title>
+    <link rel="import" href="navigation.html" id="navigation"/>
+    <script src="../js/user.js"></script>
+    <script src="../js/pet.js"></script>
+
+
+</head>
+<body>
+<iframe src="navigation.html" width="100%" height="90px" scrolling="no" frameborder=0
+        style="vertical-align: bottom"></iframe>
+
+<div>
+    <h2>修改宠物信息</h2>
+    <form id="update-form">
+        <div class="form-group">
+            <label for="picture-input">头像：</label>
+            <input type="file" id="picture" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label for="name-input">名字：</label>
+            <input type="text" id="name">
+        </div>
+        <div class="form-group">
+            <label for="introduction-input">介绍：</label>
+            <input type="text" id="introduction">
+        </div>
+        <div class="form-group">
+            <label for="attribute1-input">种类：</label>
+            <input type="text" id="animal_breed">
+        </div>
+        <div class="form-group">
+            <button type="submit" id="submit-btn">提交修改</button>
+            <button type="button" id="cancel-btn">取消修改</button>
+        </div>
+    </form>
+
+</div>
+
+<script>
+    const nameInput = document.getElementById('name');
+    const introductionInput = document.getElementById('introduction');
+    const pictureInput = document.getElementById('picture');
+    const animal_breed = document.getElementById('animal_breed');
+    const submitBtn = document.getElementById('submit-btn');
+    const cancelBtn = document.getElementById('cancel-btn');
+
+
+    // 获取当前页面的URI
+    const uri = window.location.href;
+    // 解析URI
+    const parser = new URL(uri);
+    // 获取URI中的参数
+    const pet_id = parser.searchParams.get("id");
+
+    //数据回显
+    window.onload = function() {
+        // 发送 AJAX 请求到后端获取数据
+        fetch('/webapp/pet/getPet?id=' + pet_id)
+            .then(response => response.json())
+            .then(data => {
+                data = data.data
+                // 将数据回显到表单中
+                nameInput.value = data.name
+                introductionInput.value = data.introduction
+               animal_breed.value = data.animalBreed;
+            })
+            .catch(error => console.error(error));
+    };
+
+
+    //提交修改
+    submitBtn.addEventListener('click', function (event) {
+        event.preventDefault(); // 阻止默认提交行为
+
+        // 获取修改后的表单数据
+        const formData = new FormData();
+        formData.append('name', nameInput.value);
+        formData.append('introduction', introductionInput.value);
+        formData.append('animalBreed', animal_breed.value);
+        formData.append('id', pet_id);
+
+        if (pictureInput.files.length > 0) {
+            // 转换图片
+            const fileReader = new FileReader();
+            fileReader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 183;
+                    canvas.height = 122;
+                    ctx.drawImage(img, 0, 0, 183, 122);
+                    const dataUrl = canvas.toDataURL('image/png');
+                    const file = dataURLtoFile(dataUrl, 'picture.png');
+                    formData.append('picture', file);
+
+                    // 发送修改请求
+                    fetch('/webapp/pet/update', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                alert('宠物信息修改成功');
+                                window.location.href = 'pet.html?id=' + pet_id
+                            } else {
+                                alert('宠物信息修改失败');
+                            }
+                        })
+                        .catch(error => {
+                            alert('宠物信息修改失败：' + error.message);
+                        });
+                }
+                img.src = e.target.result;
+            };
+            fileReader.readAsDataURL(pictureInput.files[0]);
+        } else {
+            // 发送修改请求
+            fetch('/webapp/pet/update', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('宠物信息修改成功');
+                        window.location.href = 'pet.html?id=' + pet_id
+                    } else {
+                        alert('宠物信息修改失败');
+                    }
+                })
+                .catch(error => {
+                    alert('宠物信息修改失败：' + error.message);
+                });
+        }
+    });
+
+
+
+
+    function dataURLtoFile(dataurl, filename) {
+        const arr = dataurl.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new File([u8arr], filename, {type: mime});
+    }
+
+    //取消修改
+    cancelBtn.addEventListener('click', function (event) {
+        event.preventDefault(); // 阻止默认提交行为
+        window.location.href = 'my_pet.html?id=' + pet_id; // 跳转到宠物详情页
+    });
+</script>
+</body>
+</html>

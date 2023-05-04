@@ -32,6 +32,8 @@ func main() {
 		pet.GET("list", controller.ListPets)
 		pet.Use(middleware.Auth)
 		pet.POST("create", controller.CreatePet)
+		pet.POST("update", controller.UpdatePet)
+		pet.GET("getPet", controller.GetPet)
 		pet.POST("adopt", controller.AdoptAPet)
 		pet.GET("mine", controller.GetMine)
 	}

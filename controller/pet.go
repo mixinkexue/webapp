@@ -73,3 +73,47 @@ func GetMine(c *gin.Context) {
 	}
 	resp.CommonResp(c, res)
 }
+
+func UpdatePet(c *gin.Context) {
+	AnimalBreed := c.PostForm("animalBreed")
+	Introduction := c.PostForm("introduction")
+	Name := c.PostForm("name")
+	Id := c.PostForm("id")
+	if Name == "" || Introduction == "" || AnimalBreed == "" {
+		c.Error(errors.New("参数不全"))
+		return
+	}
+	//上传
+	file, _ := c.FormFile("picture")
+	var addr string
+	if file != nil {
+		open, err := file.Open()
+		if err != nil {
+			c.Error(err)
+			return
+		}
+		addr, err = service.UploadFile(strconv.Itoa(rand.Int()), file.Filename, open)
+		if err != nil {
+			c.Error(err)
+			return
+		}
+	}
+
+	id, _ := strconv.Atoi(Id)
+	pet, err := service.UpdatePet(context.Background(), id, AnimalBreed, Introduction, addr, Name)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+	resp.CommonResp(c, pet)
+}
+
+func GetPet(ctx *gin.Context) {
+	id := ctx.Query("id")
+	atoi, _ := strconv.Atoi(id)
+	u, err := service.SelectPet(ctx, atoi)
+	if err != nil {
+		ctx.Error(err)
+	}
+	resp.CommonResp(ctx, u)
+}

@@ -59,3 +59,40 @@ func GetMine(ctx context.Context, u *ent.User) (res [3][]*ent.Pet, err error) {
 	}
 	return
 }
+
+func SelectPet(ctx context.Context, id int) (*ent.Pet, error) {
+	pet, err := client.Pet.Query().Where(pet.ID(id)).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return pet, nil
+}
+func UpdatePet(ctx context.Context, id int, breed, intro, addr, name string) (*ent.Pet, error) {
+	pet, err := client.Pet.Query().Where(pet.ID(id)).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	update := pet.Update()
+	if breed != "" {
+		update.SetAnimalBreed(breed)
+	}
+
+	if intro != "" {
+		update.SetIntroduction(intro)
+	}
+
+	if addr != "" {
+		update.SetPicture(addr)
+	}
+
+	if name != "" {
+		update.SetName(name)
+	}
+
+	updatedPet, err := update.Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedPet, nil
+}

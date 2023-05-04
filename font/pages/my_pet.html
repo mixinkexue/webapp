@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="my_pet.css"/>
+    <meta name="referrer" content="no-referrer">
+    <title>我的宠物</title>
+    <link rel="import" href="navigation.html" id="navigation"/>
+    <script src="../js/user.js"></script>
+    <script src="../js/pet.js"></script>
+
+
+</head>
+
+<body>
+<iframe src="navigation.html" width="100%" height="90px" scrolling="no" frameborder=0
+        style="vertical-align: bottom"></iframe>
+<!-- 我领养的宠物 -->
+<div class="pet-section">
+    <h3 class="pet-title">我领养的宠物</h3>
+    <div class="my_pet">
+
+    </div>
+</div>
+
+<!-- Second section - My Pets -->
+<div class="pet-section">
+    <h3 class="pet-title">被领养的宠物</h3>
+    <button id="add-pet-btn">发布宠物</button>
+    <div class="my_public">
+
+    </div>
+</div>
+
+<!-- Third section - Unadopted pets -->
+<div class="pet-section">
+    <h3 class="pet-title">未领养的宠物</h3>
+    <div class="unadopted_pet">
+
+    </div>
+</div>
+
+
+<script>
+    // 获取元素
+    const myPetSection = document.querySelector('.my_pet');
+    const myPublicSection = document.querySelector('.my_public');
+    const unadoptedPetSection = document.querySelector('.unadopted_pet');
+
+    // 使用fetch函数获取数据
+
+    fetch('/webapp/pet/mine', {
+        credentials: 'include'
+    })
+        .then(response => response.json())
+        .then(data => {
+            const myPetData = data.data[0];
+            const myPublicData = data.data[1];
+            const unadoptedPetData = data.data[2];
+
+            // 遍历我的宠物数据，将每个宠物以图片形式添加到 HTML
+            myPetData.forEach(pet => {
+                petCard = document.createElement('div');
+                petCard.classList.add('pet-card');
+
+                petImage = document.createElement('img');
+                petImage.src = pet.picture;
+                petImage.alt = pet.name;
+                petCard.appendChild(petImage);
+
+                petName = document.createElement('h2');
+                petName.textContent = pet.name;
+                petCard.appendChild(petName);
+
+                myPetSection.appendChild(petCard);
+            });
+
+            // 遍历我发布的宠物数据，将每个宠物以图片形式添加到 HTML
+            myPublicData.forEach(pet => {
+                petCard = document.createElement('div');
+                petCard.classList.add('pet-card');
+
+                petImage = document.createElement('img');
+                petImage.src = pet.picture;
+                petImage.alt = pet.name;
+                petCard.appendChild(petImage);
+
+                petName = document.createElement('h2');
+                petName.textContent = pet.name;
+                petCard.appendChild(petName);
+
+                myPublicSection.appendChild(petCard);
+
+            });
+
+            // 遍历未领养的宠物数据，将每个宠物以图片形式添加到 HTML
+            unadoptedPetData.forEach(pet => {
+                petCard = document.createElement('div');
+                petCard.classList.add('pet-card');
+
+                petImage = document.createElement('img');
+                petImage.src = pet.picture;
+                petImage.alt = pet.name;
+                petCard.appendChild(petImage);
+
+                petName = document.createElement('h2');
+                petName.textContent = pet.name;
+                petCard.appendChild(petName);
+
+                petButton = document.createElement('button');
+                petButton.classList.add('pet-button')
+                petButton.textContent = '详情';
+                console.log()
+                petButton.addEventListener("click", function () {
+                    window.location.href = 'pet.html?id=' + pet.id;
+                });
+                buttonContainer = document.createElement('div');
+                buttonContainer.classList.add('button-container');
+                buttonContainer.appendChild(petButton);
+                petCard.appendChild(buttonContainer);
+
+                unadoptedPetSection.appendChild(petCard);
+
+            });
+
+        })
+        .catch(error => {
+            // 处理错误
+            console.error('Error fetching pet data:', error);
+        });
+
+
+</script>
+
+<script>
+    const addPetButton = document.getElementById('add-pet-btn');
+
+    addPetButton.addEventListener('click', () => {
+        window.location.href = 'mine.html';
+    });
+</script>
+
+</body>
+
+
+</html>
